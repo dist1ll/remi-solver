@@ -14,7 +14,7 @@ pub const JOKER_CARD: Card = Card {
 ///
 /// Note that Value is different from the meld value, where a cards
 /// value is capped to 10 in the context of the meld.
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Value(u32);
 
 impl Value {
@@ -54,7 +54,7 @@ impl fmt::Debug for Value {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 #[repr(u32)]
 pub enum Suit {
     Clubs,
@@ -97,7 +97,7 @@ impl Suit {
     }
 }
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq, Eq)]
 pub struct Card {
     pub n: Value,
     pub suit: Suit,
@@ -143,6 +143,18 @@ impl Card {
     pub fn random() -> Card {
         let bound: u32 = UNIQUE_CARDS.try_into().unwrap();
         Card::from_index(fastrand::u32(..bound))
+    }
+}
+
+impl PartialOrd for Card {
+    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
+        self.to_index().partial_cmp(&other.to_index())
+    }
+}
+
+impl Ord for Card {
+    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
+        self.to_index().cmp(&other.to_index())
     }
 }
 
