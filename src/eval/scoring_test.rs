@@ -18,10 +18,9 @@ fn assert_higher_score(higher: &str, lower: &str, d: &Deck) {
 
 #[test]
 fn test_hand_sorting() {
-    let h_sorted = Hand::parse("2c 5c 5d 6c 8h Qs").unwrap();
-    let mut h = Hand::parse("5d 8h 5c 6c 2c Qs").unwrap();
+    let mut h = Hand::parse("5d 8h 5c 6c 2c Qs 10d").unwrap();
     h.sort_unstable();
-    assert_eq!(h, h_sorted);
+    assert_eq!(h, Hand::parse("2c 5c 5d 6c 8h 10d Qs").unwrap());
 }
 
 /// For hands with equal number of cards, the one with

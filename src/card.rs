@@ -2,6 +2,8 @@
 use core::fmt;
 use std::char;
 
+use substring::Substring;
+
 use crate::*;
 
 pub const JOKER_CARD: Card = Card {
@@ -25,16 +27,16 @@ impl Value {
         Value(n)
     }
 
-    pub fn from_char(c: char) -> Result<Value, Error> {
+    pub fn from_str(c: &str) -> Result<Value, Error> {
         match c {
-            'X' => Ok(Value::new(0)),
-            'A' => Ok(Value::new(1)),
-            'J' => Ok(Value::new(11)),
-            'Q' => Ok(Value::new(12)),
-            'K' => Ok(Value::new(13)),
-            num => match num.to_digit(10) {
-                None => Err(Error::ParseError),
-                Some(n) => Ok(Value::new(n)),
+            "X" => Ok(Value::new(0)),
+            "A" => Ok(Value::new(1)),
+            "J" => Ok(Value::new(11)),
+            "Q" => Ok(Value::new(12)),
+            "K" => Ok(Value::new(13)),
+            num => match num.parse::<u32>() {
+                Err(_) => Err(Error::ParseError),
+                Ok(n) => Ok(Value::new(n)),
             },
         }
     }
@@ -128,11 +130,11 @@ impl Card {
         if s == "X" {
             return Ok(JOKER_CARD);
         }
-        assert!(s.chars().count() == 2);
+        let char_count = s.chars().count();
+        assert!(char_count <= 3);
 
-        let mut c_iter = s.chars();
-        let r_n = Value::from_char(c_iter.next().unwrap());
-        let r_suit = Suit::from_char(c_iter.next().unwrap());
+        let r_n = Value::from_str(s.substring(0, char_count - 1));
+        let r_suit = Suit::from_char(s.chars().nth(char_count - 1).unwrap());
         match (r_n, r_suit) {
             (Ok(n), Ok(suit)) => Ok(Card { n, suit }),
             _ => Err(Error::ParseError),
