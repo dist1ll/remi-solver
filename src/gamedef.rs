@@ -29,8 +29,16 @@ impl HandUtil for Hand {
         }
     }
 
-    fn parse(_s: &str) -> Result<Hand, Error> {
-        Ok(Hand::new())
+    fn parse(s: &str) -> Result<Hand, Error> {
+        let mut h = Hand::new();
+        let split = s.split(' ');
+        for chunk in split {
+            let card = Card::parse(chunk)?;
+            if h.try_push(card).is_err() {
+                return Err(Error::CapacityError(card));
+            }
+        }
+        Ok(h)
     }
 }
 
