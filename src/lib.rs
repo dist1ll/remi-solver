@@ -1,3 +1,4 @@
+#![allow(warnings)]
 // This crate is a solver for a card game known as 'Otvoreni Remi',
 // a variation of the Rummy card matching game originating from the Balkan.
 // It's closest to German Rummy, except that the total joker count is 4,
@@ -12,6 +13,7 @@
 // All invariants of the constants are asserted by unit tests.
 pub const MAX_CARD_VAL: u32 = 13;
 pub const MAX_HAND_SIZE: usize = 15;
+pub const MAX_MELD_COUNT: usize = 5;
 pub const UNIQUE_CARDS: usize = 53;
 pub const DUPLICATE_COUNT: u32 = 2;
 pub const JOKER_TOTAL: u32 = 4;
