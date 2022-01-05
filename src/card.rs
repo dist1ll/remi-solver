@@ -97,6 +97,12 @@ impl Suit {
             _ => Err(Error::ParseError),
         }
     }
+
+    pub fn iter() -> std::slice::Iter<'static, Suit> {
+        use Suit::*;
+        static SUITS: [Suit; 5] = [Clubs, Diamonds, Hearts, Spades, Joker];
+        SUITS.iter()
+    }
 }
 
 #[derive(Copy, Clone, PartialEq, Eq)]
