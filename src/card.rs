@@ -112,6 +112,9 @@ pub struct Card {
 }
 
 impl Card {
+    pub fn is_predecessor(&self, c: &Card) -> bool {
+        self.n.0 == (c.n.0 - 1)
+    }
     /// Converts a Card to its index in the sorted list of unique cards.
     /// E.g.: Ac = 0, Ad = 1, ..., J = 52
     pub fn to_index(&self) -> usize {
