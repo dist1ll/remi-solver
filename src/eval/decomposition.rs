@@ -71,16 +71,15 @@ fn assert_group_eq(g: &Group, hand: &'static str) {
     }
 }
 
+fn assert_partition(p: &Partition, format: &'static str) {
+    let f = format!("{:?}", p);
+    assert_eq!(f, format);
+}
 #[test]
 fn test_partition_suit() {
     let mut h = Hand::parse("Ac 6s 9h 10d 5h 3c Kc 7s 9c 4d Jd X").unwrap();
     let partition = partition_suit(&h);
-    assert!(partition.len() == 5);
-    assert_group_eq(&partition[0], "Ac 3c Kc 9c");
-    assert_group_eq(&partition[1], "10d 4d Jd");
-    assert_group_eq(&partition[2], "9h 5h");
-    assert_group_eq(&partition[3], "6s 7s");
-    assert_group_eq(&partition[4], "X");
+    assert_partition(&partition, "[[[Ac], [3c], [Kc], [9c]], [[10d], [4d], [Jd]], [[9h], [5h]], [[6s], [7s]], [[X]]]");
 }
 
 #[test]

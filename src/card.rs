@@ -178,10 +178,10 @@ impl fmt::Debug for Card {
 impl fmt::Debug for Suit {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
-            Suit::Clubs => write!(f, "♣"),
-            Suit::Diamonds => write!(f, "♦"),
-            Suit::Hearts => write!(f, "♥"),
-            Suit::Spades => write!(f, "♠"),
+            Suit::Clubs => write!(f, "c"),
+            Suit::Diamonds => write!(f, "d"),
+            Suit::Hearts => write!(f, "h"),
+            Suit::Spades => write!(f, "s"),
             Suit::Joker => write!(f, ""),
         }
     }
