@@ -1,1 +1,43 @@
 use super::decomposition::*;
+use crate::card::*;
+use crate::gamedef::*;
+
+/// Asserts whether the cards in a Group are equal to those
+/// given in the string argument.
+fn assert_group_eq(g: &Group, hand: &'static str) {
+    let h = Hand::parse(hand).unwrap();
+    let mut i: usize = 0;
+    for &&elem in g.iter() {
+        assert_eq!(elem, h[i]);
+        i += 1;
+    }
+}
+
+fn partition_eq(p: &Partition, format: &'static str) {
+    let f = format!("{:?}", p);
+    assert_eq!(f, format);
+}
+
+#[test]
+fn test_partition_suit() {
+    let mut h = Hand::parse("Ac 6s 9h 10d 5h 3c Kc 7s 9c 4d Jd X").unwrap();
+    let p = partition_suit(&h);
+
+    assert!(p.len() == 5);
+    partition_eq(
+        &p,
+        "[[[Ac], [3c], [Kc], [9c]], [[10d], [4d], [Jd]], [[9h], [5h]], [[6s], [7s]], [[X]]]",
+    );
+}
+
+#[test]
+fn decomp_naive() {
+    let h = Hand::parse("Ac 2c 3c 2h 4h 5h Qs Ks 8c 9c 10c Qc Kc").unwrap();
+    let d = naive_decomposition(&h);
+
+    assert!(d.len() == 6);
+    partition_eq(&d, "[[[Ac], [2c], [3c]], [[8c], [9c], [10c]], [[Qc], [Kc]], [[2h]], [[4h], [5h]], [[Qs], [Ks]]]");
+}
+
+#[test]
+fn decomp_optimize_simple() {}

@@ -13,9 +13,19 @@ pub type Partition<'a> = ArrayVec<Group<'a>, MAX_DECOMP_COUNT>;
 /// melds or quasi-melds.
 pub type Group<'a> = ArrayVec<&'a Card, MAX_HAND_SIZE>;
 
+trait Optimize {
+    /// Finds the optimal partition w.r.t. decomp score (see README).
+    /// Compute-intensive method, so use sparingly.
+    fn optimize(&mut self);
+}
+
+impl<'a> Optimize for Partition<'a> {
+    fn optimize(&mut self) {}
+}
+
 /// Divides a hand into distinct groups of suits, and returns them
 /// as a Partition.
-fn partition_suit(h: &Hand) -> Partition {
+pub fn partition_suit(h: &Hand) -> Partition {
     let mut p = Partition::new();
     for &suit in Suit::iter() {
         let s_group = h.iter().filter(|c| c.suit == suit).collect::<Group>();
@@ -31,7 +41,7 @@ fn partition_suit(h: &Hand) -> Partition {
 /// groups cards into melds or quasi-melds.
 ///
 /// It can be used to bootstrap an optimal decomposition search.
-fn naive_decomposition(h: &Hand) -> Partition {
+pub fn naive_decomposition(h: &Hand) -> Partition {
     let p = partition_suit(h);
     let mut decomp = Partition::new();
     for sg in p.iter() {
@@ -56,49 +66,3 @@ fn naive_decomposition(h: &Hand) -> Partition {
     }
     decomp
 }
-///////////////////
-//  UNIT TESTING //
-///////////////////
-
-/// Asserts whether the cards in a Group are equal to those
-/// given in the string argument.
-fn assert_group_eq(g: &Group, hand: &'static str) {
-    let h = Hand::parse(hand).unwrap();
-    let mut i: usize = 0;
-    for &&elem in g.iter() {
-        assert_eq!(elem, h[i]);
-        i += 1;
-    }
-}
-
-fn assert_partition(p: &Partition, format: &'static str) {
-    let f = format!("{:?}", p);
-    assert_eq!(f, format);
-}
-#[test]
-fn test_partition_suit() {
-    let mut h = Hand::parse("Ac 6s 9h 10d 5h 3c Kc 7s 9c 4d Jd X").unwrap();
-    let partition = partition_suit(&h);
-    assert_partition(&partition, "[[[Ac], [3c], [Kc], [9c]], [[10d], [4d], [Jd]], [[9h], [5h]], [[6s], [7s]], [[X]]]");
-}
-
-#[test]
-fn decomp_create() {
-    let mut d = Partition::new();
-}
-
-#[test]
-fn decomp_simple() {
-    let mut h = Hand::parse("Ac 2c 3c 2h 4h 5h Qs Ks 8c 9c 10c Qc Kc").unwrap();
-    h.sort_unstable();
-    let d = naive_decomposition(&h);
-    assert!(d.len() == 6);
-    assert_group_eq(&d[0], "Ac 2c 3c");
-    assert_group_eq(&d[1], "8c 9c 10c");
-    assert_group_eq(&d[2], "Qc Kc");
-    assert_group_eq(&d[3], "2h");
-    assert_group_eq(&d[4], "4h 5h");
-    assert_group_eq(&d[5], "Qs Ks");
-}
-
-fn handle(g: &Group) {}
