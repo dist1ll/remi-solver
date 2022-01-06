@@ -21,8 +21,8 @@ pub trait HandUtil {
     /// Fails if the syntax/card symbols are incorrect.
     fn parse(s: &str) -> Result<Hand, Error>;
 
-    /// Finds all distinct sorted melds
-    fn find_melds(&self) -> ArrayVec<Hand, MAX_MELD_COUNT>;
+    /// Parses a Hand string and returns a sorted collection of card.
+    fn parse_sorted(s: &str) -> Result<Hand, Error>;
 }
 
 impl HandUtil for Hand {
@@ -44,34 +44,10 @@ impl HandUtil for Hand {
         Ok(h)
     }
 
-    fn find_melds(&self) -> ArrayVec<Hand, MAX_MELD_COUNT> {
-        let mut sorted = self.clone();
-        sorted.sort_unstable();
-        let mut result = ArrayVec::<Hand, MAX_MELD_COUNT>::new();
-
-        for x in sorted.iter() {
-            // Number-based matches (e.g. 555 or 9999)
-            let mut number_meld = Hand::new();
-            number_meld.push(*x);
-
-            let mut suit_meld = Hand::new();
-            for y in sorted.iter() {
-                if y.n == x.n && y.suit != x.suit {
-                    number_meld.push(*y);
-                }
-            }
-
-            number_meld.sort_unstable();
-            // TODO: LOTS OF THINGS NEED TO BE IMPROVED. THINK ABUOUT MELDS
-            if number_meld.len() >= 3 {
-                // check if meld exists
-                for meld in result.iter() {
-                    if meld.get(0) != number_meld.get(0) && meld.len() == number_meld.len() {}
-                }
-                result.push(number_meld);
-            }
-        }
-        result
+    fn parse_sorted(s: &str) -> Result<Hand, Error> {
+        let mut h = Hand::parse(s)?;
+        h.sort_unstable();
+        Ok(h)
     }
 }
 

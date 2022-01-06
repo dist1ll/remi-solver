@@ -40,4 +40,6 @@ fn decomp_naive() {
 }
 
 #[test]
-fn decomp_optimize_simple() {}
+fn decomp_optimize_simple() {
+    let h = Hand::parse_sorted("5s 2c 5h 5c");
+}
