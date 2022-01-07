@@ -89,9 +89,19 @@ pub fn naive_decomposition(h: &Hand) -> Partition {
 /// Compute-intensive method, so use sparingly.
 pub fn optimal_decomposition(h: &Hand) -> Partition {
     let mut p = naive_decomposition(h);
+
+    merge_single_numbers(&mut p);
+
+    p
+}
+
+/// Merges together all single(!) groups with the same number
+/// in a partition. Note that it does not consider quasi-melds.
+///
+/// So {[5], [5], [5]} becomes {[5, 5, 5]}
+fn merge_single_numbers(p: &mut Partition) {
     let dup_p = p.clone();
     for x in 0..p.len() {
-        // skip (quasi-melds)
         if !p[x].is_single() {
             continue;
         }
@@ -106,5 +116,4 @@ pub fn optimal_decomposition(h: &Hand) -> Partition {
         }
     }
     p.retain(|e| !e.is_empty());
-    p
 }
