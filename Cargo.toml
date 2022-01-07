@@ -1,3 +1,11 @@
+[lib]
+doctest = false
+
+[[bin]]
+name = "cli-solver"
+test = false
+doctest = false
+
 [package]
 name = "remi-solver"
 version = "0.1.0"

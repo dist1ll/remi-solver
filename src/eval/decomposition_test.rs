@@ -32,7 +32,7 @@ fn test_partition_suit() {
 
 #[test]
 fn decomp_naive() {
-    let h = Hand::parse("Ac 2c 3c 2h 4h 5h Qs Ks 8c 9c 10c Qc Kc").unwrap();
+    let h = Hand::parse_sorted("2c Ac 3c 2h 4h 5h Qs Ks 8c 9c 10c Qc Kc").unwrap();
     let d = naive_decomposition(&h);
 
     assert!(d.len() == 6);
@@ -41,5 +41,7 @@ fn decomp_naive() {
 
 #[test]
 fn decomp_optimize_simple() {
-    let h = Hand::parse_sorted("5s 2c 5h 5c");
+    let h = Hand::parse_sorted("5s 5h 5c").unwrap();
+    let mut p: Partition = optimal_decomposition(&h);
+    partition_eq(&p, "[[[5c], [5h], [5s]]]");
 }

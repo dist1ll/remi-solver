@@ -13,16 +13,52 @@ pub type Partition<'a> = ArrayVec<Group<'a>, MAX_DECOMP_COUNT>;
 /// melds or quasi-melds.
 pub type Group<'a> = ArrayVec<&'a Card, MAX_HAND_SIZE>;
 
-trait Optimize {
-    /// Finds the optimal partition w.r.t. decomp score (see README).
-    /// Compute-intensive method, so use sparingly.
-    fn optimize(&mut self);
+pub trait PartitionUtil {
+    /// Removes empty groups from partition
+    fn clean_empty(&mut self);
 }
 
-impl<'a> Optimize for Partition<'a> {
-    fn optimize(&mut self) {}
+impl<'a> PartitionUtil for Partition<'a> {
+    fn clean_empty(&mut self) {
+        let mut i: usize = 0;
+        while i < self.len() {
+            if self[i].is_empty() {
+                self.swap_remove(i);
+                continue;
+            }
+            i += 1;
+        }
+    }
 }
 
+pub trait GroupCharacteristics {
+    /// Returns true if Group has only one element.
+    fn is_single(&self) -> bool;
+    /// Returns true if Group has at least 3 connected
+    /// components = meld.
+    fn is_meld(&self) -> bool;
+    /// Returns true if Group has exactly 2 connected
+    /// components = quasi-meld.
+    fn is_quasi_meld(&self) -> bool;
+}
+
+impl<'a> GroupCharacteristics for Group<'a> {
+    fn is_single(&self) -> bool {
+        self.len() == 1
+    }
+    fn is_quasi_meld(&self) -> bool {
+        if self.len() != 2 {
+            return false;
+        }
+        self[0].is_predecessor(self[1])
+    }
+    fn is_meld(&self) -> bool {
+        if self.len() != 3 {
+            return false;
+        }
+        self[0].is_predecessor(self[1]) && self[1].is_predecessor(self[2])
+    }
+}
 /// Divides a hand into distinct groups of suits, and returns them
 /// as a Partition.
 pub fn partition_suit(h: &Hand) -> Partition {
@@ -65,4 +101,28 @@ pub fn naive_decomposition(h: &Hand) -> Partition {
         }
     }
     decomp
+}
+
+/// Finds the optimal partition w.r.t. decomp score (see README).
+/// Compute-intensive method, so use sparingly.
+pub fn optimal_decomposition(h: &Hand) -> Partition {
+    let mut p = naive_decomposition(h);
+    let dup_p = p.clone();
+    for x in 0..p.len() {
+        // skip (quasi-melds)
+        if !p[x].is_single() {
+            continue;
+        }
+        for y in 0..p.len() {
+            if !p[y].is_single() {
+                continue;
+            }
+            if p[x][0].n == p[y][0].n {
+                p[x].try_push(dup_p[y][0]);
+                p[y].swap_remove(0);
+            }
+        }
+    }
+    p.clean_empty();
+    p
 }
