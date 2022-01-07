@@ -13,24 +13,6 @@ pub type Partition<'a> = ArrayVec<Group<'a>, MAX_DECOMP_COUNT>;
 /// melds or quasi-melds.
 pub type Group<'a> = ArrayVec<&'a Card, MAX_HAND_SIZE>;
 
-pub trait PartitionUtil {
-    /// Removes empty groups from partition
-    fn clean_empty(&mut self);
-}
-
-impl<'a> PartitionUtil for Partition<'a> {
-    fn clean_empty(&mut self) {
-        let mut i: usize = 0;
-        while i < self.len() {
-            if self[i].is_empty() {
-                self.swap_remove(i);
-                continue;
-            }
-            i += 1;
-        }
-    }
-}
-
 pub trait GroupCharacteristics {
     /// Returns true if Group has only one element.
     fn is_single(&self) -> bool;
@@ -123,6 +105,6 @@ pub fn optimal_decomposition(h: &Hand) -> Partition {
             }
         }
     }
-    p.clean_empty();
+    p.retain(|e| !e.is_empty());
     p
 }
