@@ -52,3 +52,17 @@ fn decomp_optimize_simple2() {
     let mut p: Partition = optimal_decomposition(&h);
     partition_eq(&p, "[[[Ac], [2c], [3c]], [[5c], [5h], [5s]]]");
 }
+
+#[test]
+fn decomp_optimize_double() {
+    let h = Hand::parse_sorted("Ac 2c 3c 4c 4c").unwrap();
+    let mut p: Partition = optimal_decomposition(&h);
+    partition_eq(&p, "[[[Ac], [2c], [3c], [4c]], [[4c]]]");
+}
+
+#[test]
+fn decomp_optimize_split_simple() {
+    let h = Hand::parse_sorted("Ac 2c 3c 4c 4d 4h").unwrap();
+    let mut p: Partition = optimal_decomposition(&h);
+    partition_eq(&p, "[[[Ac], [2c], [3c]], [[4c], [4d], [4h]]]");
+}
