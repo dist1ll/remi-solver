@@ -1,7 +1,8 @@
-mod decomposition;
+mod decomp_score;
+mod decomp;
 
 #[cfg(test)]
-mod decomposition_test;
+mod decomp_test;
 #[cfg(test)]
 mod scoring_test;
 

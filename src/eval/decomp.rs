@@ -7,6 +7,13 @@ use arrayvec::ArrayVec;
 /// Maximum number of cardgroups (hand) in a decomposition.
 pub const MAX_DECOMP_COUNT: usize = 15;
 
+/// A Partition is a set of disjoint subsets (or Groups) of Cards from
+/// a shared Hand. A Partition whose Groups are only either single, melds,
+/// or quasi-melds are referred to as "decomposition".
+///
+/// A decomposition is a way of looking at cards in Rummy in preparation
+/// for the next move. A good decomposition will tell you how to incorporate
+/// a new card into your Hand, and how to compare cards within a Hand.
 pub type Partition<'a> = ArrayVec<Group<'a>, MAX_DECOMP_COUNT>;
 
 /// A Group is a subset of Cards. A group may or may not contain
@@ -116,4 +123,9 @@ fn merge_single_numbers(p: &mut Partition) {
         }
     }
     p.retain(|e| !e.is_empty());
+}
+
+pub fn partition_eq(p: &Partition, format: &'static str) {
+    let f = format!("{:?}", p);
+    assert_eq!(f, format);
 }

@@ -1,4 +1,4 @@
-use super::decomposition::*;
+use super::decomp::*;
 use crate::card::*;
 use crate::gamedef::*;
 
@@ -11,11 +11,6 @@ fn assert_group_eq(g: &Group, hand: &'static str) {
         assert_eq!(elem, h[i]);
         i += 1;
     }
-}
-
-fn partition_eq(p: &Partition, format: &'static str) {
-    let f = format!("{:?}", p);
-    assert_eq!(f, format);
 }
 
 #[test]
