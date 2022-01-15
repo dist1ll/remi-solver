@@ -26,7 +26,7 @@ fn test_partition_suit() {
 }
 
 #[test]
-fn decomp_naive() {
+fn naive() {
     let h = Hand::parse_sorted("2c Ac 3c 2h 4h 5h Qs Ks 8c 9c 10c Qc Kc").unwrap();
     let d = naive_decomposition(&h);
 
@@ -35,28 +35,28 @@ fn decomp_naive() {
 }
 
 #[test]
-fn decomp_optimize_simple() {
+fn optimize_simple() {
     let h = Hand::parse_sorted("5s 5h 5c").unwrap();
     let mut p: Partition = optimal_decomposition(&h);
     partition_eq(&p, "[[[5c], [5h], [5s]]]");
 }
 
 #[test]
-fn decomp_optimize_simple2() {
+fn optimize_two_suits() {
     let h = Hand::parse_sorted("Ac 2c 3c 5s 5h 5c").unwrap();
     let mut p: Partition = optimal_decomposition(&h);
     partition_eq(&p, "[[[Ac], [2c], [3c]], [[5c], [5h], [5s]]]");
 }
 
 #[test]
-fn decomp_optimize_double() {
+fn optimize_double() {
     let h = Hand::parse_sorted("Ac 2c 3c 4c 4c").unwrap();
     let mut p: Partition = optimal_decomposition(&h);
     partition_eq(&p, "[[[Ac], [2c], [3c], [4c]], [[4c]]]");
 }
 
 #[test]
-fn decomp_optimize_split_simple() {
+fn optimize_split_simple() {
     let h = Hand::parse_sorted("Ac 2c 3c 4c 4d 4h").unwrap();
     let mut p: Partition = optimal_decomposition(&h);
     partition_eq(&p, "[[[Ac], [2c], [3c]], [[4c], [4d], [4h]]]");

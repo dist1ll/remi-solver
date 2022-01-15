@@ -1,6 +1,6 @@
-use crate::Error;
 use crate::card::*;
 use crate::gamedef::*;
+use crate::Error;
 use crate::MAX_HAND_SIZE;
 
 use arrayvec::ArrayVec;
@@ -22,7 +22,7 @@ pub type Partition<'a> = ArrayVec<Group<'a>, MAX_DECOMP_COUNT>;
 pub type Group<'a> = ArrayVec<&'a Card, MAX_HAND_SIZE>;
 
 pub trait GroupCharacteristics<'a> {
-    // Creates a group from elements contained in the indices
+    /// Creates a group from elements contained in the indices
     fn from_hand<'b>(h: &'b Hand, indices: &[usize]) -> Result<Group<'b>, Error>;
     /// Returns true if Group has only one element.
     fn is_single(&self) -> bool;
@@ -35,7 +35,6 @@ pub trait GroupCharacteristics<'a> {
 }
 
 impl<'a> GroupCharacteristics<'_> for Group<'a> {
-
     fn from_hand<'b>(h: &'b Hand, indices: &[usize]) -> Result<Group<'b>, Error> {
         let mut g = Group::new();
         for &i in indices {
@@ -57,12 +56,49 @@ impl<'a> GroupCharacteristics<'_> for Group<'a> {
         self[0].is_predecessor(self[1])
     }
     fn is_meld(&self) -> bool {
-        if self.len() != 3 {
+        if self.len() < 3 {
             return false;
         }
-        self[0].is_predecessor(self[1]) && self[1].is_predecessor(self[2])
+        // number meld
+        if self[0].n == self[1].n {
+            return match self.len() {
+                3 => {
+                    return self[0].suit != self[1].suit
+                        && self[1].suit != self[2].suit
+                        && self[2].suit != self[0].suit
+                }
+                4 => {
+                    return self[0].suit != self[1].suit
+                        && self[1].suit != self[2].suit
+                        && self[2].suit != self[0].suit
+                        && self[2].suit != self[3].suit
+                        && self[1].suit != self[3].suit
+                        && self[0].suit != self[3].suit
+                },
+                _ => return false,
+            };
+        }
+        // suit meld
+        else {
+            let mut result: bool = true;
+            for i in 0..(self.len() - 1) {
+                result = result && self[i].is_predecessor(self[i+1]);
+            }
+            return result;
+        }
     }
 }
+
+/// Creates a partition from a given 2d-array of indices.
+pub fn partition_index<'a>(h: &'a Hand, indices: &[&[usize]]) -> Result<Partition<'a>, Error> {
+    let mut p = Partition::new();
+    for &i in indices {
+        let g = Group::from_hand(h, i)?;
+        p.try_push(g);
+    }
+    Ok(p)
+}
+
 /// Divides a hand into distinct groups of suits, and returns them
 /// as a Partition.
 pub fn partition_suit(h: &Hand) -> Partition {
