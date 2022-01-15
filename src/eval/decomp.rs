@@ -1,3 +1,4 @@
+use crate::Error;
 use crate::card::*;
 use crate::gamedef::*;
 use crate::MAX_HAND_SIZE;
@@ -20,7 +21,9 @@ pub type Partition<'a> = ArrayVec<Group<'a>, MAX_DECOMP_COUNT>;
 /// melds or quasi-melds.
 pub type Group<'a> = ArrayVec<&'a Card, MAX_HAND_SIZE>;
 
-pub trait GroupCharacteristics {
+pub trait GroupCharacteristics<'a> {
+    // Creates a group from elements contained in the indices
+    fn from_hand<'b>(h: &'b Hand, indices: &[usize]) -> Result<Group<'b>, Error>;
     /// Returns true if Group has only one element.
     fn is_single(&self) -> bool;
     /// Returns true if Group has at least 3 connected
@@ -31,7 +34,19 @@ pub trait GroupCharacteristics {
     fn is_quasi_meld(&self) -> bool;
 }
 
-impl<'a> GroupCharacteristics for Group<'a> {
+impl<'a> GroupCharacteristics<'_> for Group<'a> {
+
+    fn from_hand<'b>(h: &'b Hand, indices: &[usize]) -> Result<Group<'b>, Error> {
+        let mut g = Group::new();
+        for &i in indices {
+            if i >= h.len() {
+                return Err(Error::GroupIndexError);
+            }
+            g.try_push(&h[i]);
+        }
+        Ok(g)
+    }
+
     fn is_single(&self) -> bool {
         self.len() == 1
     }

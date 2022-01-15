@@ -14,8 +14,5 @@ pub fn decomp_score(p: &Partition, d: &Deck) -> f64 {
 #[test]
 fn decomp_score_simple() {
     let h = Hand::parse_sorted("Ac 2c 3c 4c 4d 4h").unwrap();
-    let mut g = Group::new();
-    g.try_push(&h[0]);
-    let mut p: Partition = optimal_decomposition(&h);
-    partition_eq(&p, "[[[Ac], [2c], [3c]], [[4c], [4d], [4h]]]");
+    let mut g = Group::from_hand(&h, &[0, 1, 2, 3]);
 }
