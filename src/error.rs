@@ -12,6 +12,8 @@ pub enum Error {
     CapacityError(Card),
 
     GroupIndexError,
+
+    EnumOutOfBounds,
 }
 
 impl ::std::error::Error for Error {}
@@ -23,6 +25,7 @@ impl fmt::Display for Error {
             Error::ParseError => write!(f, "Couldn't parse Card or Hand string"),
             Error::CapacityError(c) => write!(f, "Can't add card {:?}, hand is full", c),
             Error::GroupIndexError => write!(f, "Incorrect index given for group"),
+            Error::EnumOutOfBounds => write!(f, "Enum conversion value wasn't correct. Check definition!"),
         }
     }
 }

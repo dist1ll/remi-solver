@@ -57,7 +57,6 @@ impl fmt::Debug for Value {
 }
 
 #[derive(Copy, Clone, PartialEq, Eq)]
-#[repr(u32)]
 pub enum Suit {
     Clubs,
     Diamonds,
@@ -67,24 +66,24 @@ pub enum Suit {
 }
 
 impl Suit {
-    pub fn from_int(n: u32) -> Result<Suit, ()> {
+    pub fn from_int(n: u32) -> Result<Suit, Error> {
         match n {
-            0 => Ok(Suit::Clubs),
-            1 => Ok(Suit::Diamonds),
-            2 => Ok(Suit::Hearts),
-            3 => Ok(Suit::Spades),
-            4 => Ok(Suit::Joker),
-            _ => Err(()),
+            0b00001 => Ok(Suit::Clubs),
+            0b00010 => Ok(Suit::Diamonds),
+            0b00100 => Ok(Suit::Hearts),
+            0b01000 => Ok(Suit::Spades),
+            0b10000 => Ok(Suit::Joker),
+            _ => Err(Error::EnumOutOfBounds),
         }
     }
 
     pub fn to_int(self) -> u32 {
         match self {
-            Suit::Clubs => 0,
-            Suit::Diamonds => 1,
-            Suit::Hearts => 2,
-            Suit::Spades => 3,
-            Suit::Joker => 4,
+            Suit::Clubs => 0b00001,
+            Suit::Diamonds => 0b00010,
+            Suit::Hearts => 0b00100,
+            Suit::Spades => 0b01000,
+            Suit::Joker => 0b10000,
         }
     }
 

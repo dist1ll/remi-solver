@@ -24,6 +24,8 @@ pub type Group<'a> = ArrayVec<&'a Card, MAX_HAND_SIZE>;
 pub trait GroupCharacteristics<'a> {
     /// Creates a group from elements contained in the indices
     fn from_hand<'b>(h: &'b Hand, indices: &[usize]) -> Result<Group<'b>, Error>;
+    /// Returns true if all Cards in the group have the same value
+    fn is_same_number(&self) -> bool;
     /// Returns true if Group has only one element.
     fn is_single(&self) -> bool;
     /// Returns true if Group has at least 3 connected
@@ -45,7 +47,15 @@ impl<'a> GroupCharacteristics<'_> for Group<'a> {
         }
         Ok(g)
     }
-
+    fn is_same_number(&self) -> bool {
+        let initial = self[0].n;
+        for &x in self.iter() {
+            if x.n != initial {
+                return false;
+            }
+        }
+        true
+    }
     fn is_single(&self) -> bool {
         self.len() == 1
     }
@@ -74,7 +84,7 @@ impl<'a> GroupCharacteristics<'_> for Group<'a> {
                         && self[2].suit != self[3].suit
                         && self[1].suit != self[3].suit
                         && self[0].suit != self[3].suit
-                },
+                }
                 _ => return false,
             };
         }
@@ -82,7 +92,7 @@ impl<'a> GroupCharacteristics<'_> for Group<'a> {
         else {
             let mut result: bool = true;
             for i in 0..(self.len() - 1) {
-                result = result && self[i].is_predecessor(self[i+1]);
+                result = result && self[i].is_predecessor(self[i + 1]);
             }
             return result;
         }

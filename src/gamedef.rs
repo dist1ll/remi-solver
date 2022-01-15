@@ -63,7 +63,7 @@ impl Deck {
         let mut idx = 0;
         let mut arr = [(JOKER_CARD, 2); UNIQUE_CARDS].map(|mut _c| {
             let n = Value::new(((idx / 4) % MAX_CARD_VAL) + 1);
-            let suit = Suit::from_int(idx % 4).unwrap();
+            let suit = Suit::from_int(1 << (idx % 4)).unwrap();
             idx += 1;
             (Card { n, suit }, DUPLICATE_COUNT)
         });
