@@ -1,6 +1,7 @@
-use crate::Error;
+use crate::MAX_CARD_VAL;
 use crate::card::*;
 use crate::gamedef::*;
+use crate::Error;
 
 use super::decomp::*;
 
@@ -12,7 +13,7 @@ pub fn decomp_score(p: &Partition, d: &Deck) -> f64 {
     for g in p.iter() {
         if !g.is_meld() {
             score += 0.05 * g.len() as f64;
-        }else {
+        } else {
             score += g.len() as f64;
             score += extension_score(g, d);
         }
@@ -27,27 +28,41 @@ fn extension_score(g: &Group, d: &Deck) -> f64 {
     if !g.is_meld() {
         return 0.0;
     }
-
+    
+    // number meld
     if g.is_same_number() {
         // can't extend ace meld
         if g.len() == 4 {
             return 0.0;
         }
-        
+        let suit = remaining_suit(g).unwrap();
+        return d.odds_to_draw(Card { n: g[0].n, suit });
+    } 
+    // street meld
+    else {
+        let mut score = 0.0;
+        let suit = g[0].suit;
+
+        if g[0].n != 1 {
+            score += d.odds_to_draw(g[0].prev().unwrap())
+        }
+        if g[g.len() - 1].n != MAX_CARD_VAL {
+            score += d.odds_to_draw(g[g.len() - 1].next().unwrap())
+        }
+        return score;
     }
-    0.0
 }
 
 /// For a given numeric meld with 3 members, computes the last
 /// missing suit. Excludes joker!
-fn remaining_suit(g: &Group) -> Result<Suit, Error>{
+fn remaining_suit(g: &Group) -> Result<Suit, Error> {
     let mut result: u32 = 0;
     for &c in g.iter() {
-       result = result | c.suit.to_int(); 
+        result = result | c.suit.to_int();
     }
     // invert result and mask off bits > 4 to exclude joker
     result = (!result) & 0b1111;
-    Suit::from_int(result)   
+    Suit::from_int(result)
 }
 
 #[test]
@@ -68,10 +83,11 @@ fn more_melds() {
     assert!(diff < 0.0);
 }
 
-/// Here we check if the scoring function considers the ability or
-/// inability of a meld to get extended past its numeric bounds.
+/// Here we check if the scoring function considers the ability or inability
+/// of a meld to get extended past its numeric bounds. That applies to Ace
+/// and King.
 #[test]
-fn meld_extension_score_numeric() {
+fn meld_extension_score_bounds() {
     let diff = cmp_decomp(
         &Hand::parse_sorted("Ac 2c 3c 4c 5c").unwrap(),
         &[&[0, 1, 2], &[3, 4]], // worse
@@ -79,10 +95,19 @@ fn meld_extension_score_numeric() {
         &Deck::new(),
     );
     assert!(diff < 0.0);
+
+    // Here the upper bound (King) is worse
+    let diff = cmp_decomp(
+        &Hand::parse_sorted("9c 10c Jc Qc Kc").unwrap(),
+        &[&[0, 1, 2], &[3, 4]], // better
+        &[&[0, 1], &[2, 3, 4]], // worse
+        &Deck::new(),
+    );
+    assert!(diff > 0.0);
+
 }
 
-
-/// Returns the signed score difference of the two given decompositions 
+/// Returns the signed score difference of the two given decompositions
 /// `f(d1) - f(d2)`.
 fn cmp_decomp(h: &Hand, d1: &[&[usize]], d2: &[&[usize]], deck: &Deck) -> f64 {
     let p1 = partition_index(h, d1).unwrap();

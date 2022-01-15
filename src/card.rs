@@ -111,6 +111,21 @@ pub struct Card {
 }
 
 impl Card {
+    /// Creates a new Card that is the predecessor of the current card.
+    pub fn prev(&self) -> Option<Card> {
+        if self.n.0 <= 1 {
+            return None
+        }
+        return Some(Card{n: Value::new(self.n.0 - 1), suit: self.suit});
+    }
+    /// Creates a new Card that is the predecessor of the current card.
+    pub fn next(&self) -> Option<Card> {
+        if self.n.0 >= MAX_CARD_VAL {
+            return None
+        }
+        return Some(Card{n: Value::new(self.n.0 + 1), suit: self.suit});
+    }
+ 
     pub fn is_predecessor(&self, c: &Card) -> bool {
         self.n.0 == (c.n.0 - 1)
     }
@@ -125,7 +140,6 @@ impl Card {
             }
         }
     }
-
     /// Returns a Card generated from the given canonical index.
     /// (The index lies between 0...52 incl.)
     pub fn from_index(i: u32) -> Card {
@@ -156,6 +170,11 @@ impl Card {
     }
 }
 
+impl PartialEq<u32> for Value {
+    fn eq(&self, other: &u32) -> bool {
+        self.0 == *other
+    }
+}
 impl PartialOrd for Card {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
         self.to_index().partial_cmp(&other.to_index())

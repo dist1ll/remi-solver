@@ -92,6 +92,11 @@ impl Deck {
             Err(e) => Err(e),
         }
     }
+
+    pub fn odds_to_draw(&self, card: Card) -> f64 {
+        let cards_left = self.cards[card.to_index()].1 as f64;
+        cards_left / 104.0
+    }
 }
 
 impl Index<Card> for Deck {
